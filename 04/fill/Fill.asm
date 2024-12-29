@@ -12,3 +12,31 @@
 // the screen should remain fully clear as long as no key is pressed.
 
 // Put your code here.
+
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
+@n
+M=0
+@R0
+D=M
+@1
+M=D
+(LOOP)
+@1
+D=M 
+@STOP
+D;JEQ
+@R1
+D=M
+@n
+M=M+D 
+@1
+M=M-1
+@LOOP
+0;JMP
+(STOP)
+@n
+D=M
+@R2
+M=D 
+(END)
+0;JMP

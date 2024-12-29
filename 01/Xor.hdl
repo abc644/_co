@@ -8,10 +8,16 @@
  * out = not (a == b)
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP Xor {
     IN a, b;
     OUT out;
 
     PARTS:
     // Put your code here:
+    Not (in=a, out=noa);
+    Not (in=b, out=nob);
+    And (a=noa, b=b, out=an1);
+    And (a=a, b=nob, out=an2);
+    Or (a=an1, b=an2, out=out);
 }

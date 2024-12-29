@@ -9,10 +9,13 @@
  *                 else out does not change (out[t+1] = out[t])
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP Bit {
     IN in, load;
     OUT out;
 
     PARTS:
     // Put your code here:
+    Mux(a=do, b=in, sel=load, out=mo);
+    DFF(in=mo, out=do, out=out);
 }

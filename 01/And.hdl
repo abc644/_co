@@ -9,10 +9,13 @@
  *       0 otherwise
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP And {
     IN a, b;
     OUT out;
 
     PARTS:
     // Put your code here:
+    Nand (a=a, b=b, out=nandout);
+    Not (in=nandout, out=out);
 }

@@ -14,10 +14,35 @@
  * with the computer via the keyboard.
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP Computer {
 
     IN reset;
 
     PARTS:
     // Put your code here:
+    // Program ROM: Stores the instructions for execution.
+    // ROM's output is connected to the CPU's instruction input.
+    ROM32K(address=pc, out=instruction);
+
+    // CPU: Executes instructions and interacts with memory.
+    // The CPU takes the current instruction, the reset signal, and the inM value.
+    CPU(
+        inM=outMemory, 
+        instruction=instruction, 
+        reset=reset,
+        outM=outM, 
+        writeM=writeM, 
+        addressM=addressM, 
+        pc=pc
+    );
+
+    // Memory: Handles the complete address space.
+    // The memory chip's input/output is connected to the CPU and external devices.
+    Memory(
+        in=outM, 
+        load=writeM, 
+        address=addressM, 
+        out=outMemory
+    );
 }

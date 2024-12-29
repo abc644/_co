@@ -9,10 +9,14 @@
  *          {0, in} if sel == 1
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP DMux {
     IN in, sel;
     OUT a, b;
 
     PARTS:
     // Put your code here:
+    Not (in = sel, out = nsel);
+    And (a = in, b = nsel, out = a);
+    And (a = in, b = sel, out = b);
 }

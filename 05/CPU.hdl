@@ -25,6 +25,7 @@
  * than to the address resulting from executing the current instruction. 
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP CPU {
 
     IN  inM[16],         // M value input  (M = contents of RAM[A])
@@ -40,4 +41,65 @@ CHIP CPU {
 
     PARTS:
     // Put your code here:
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+    // A Register
+    // Select the value to load into A:
+    //   If instruction[15] == 0: load instruction directly (A-instruction).
+    //   If instruction[15] == 1: load ALU result (C-instruction).
+    Mux16(a=instruction, b=aluOut, sel=instruction[15], out=aMuxOut);
+    ARegister(in=aMuxOut, load=aLoad, out=aOut, out[0..14]=addressM);
+
+    // D Register
+    // Holds the ALU result if the D-register is the destination.
+    DRegister(in=aluOut, load=dLoad, out=dOut);
+
+    // ALU
+    // Compute the ALU operation using D register (x) and M or A (y).
+    Mux16(a=aOut, b=inM, sel=instruction[12], out=aluY);
+    ALU(x=dOut, y=aluY, zx=instruction[11], nx=instruction[10],
+        zy=instruction[9], ny=instruction[8],
+        f=instruction[7], no=instruction[6],
+        out=aluOut, zr=aluZr, ng=aluNg);
+
+    // Memory Write Control
+    // writeM is asserted if M is the destination (instruction[3] == 1).
+    And(a=instruction[3], b=instruction[15], out=writeM);
+    // ALU output to M
+    And16(a=aluOut, b=true, out=outM);
+
+    // Program Counter (PC)
+    // Calculate whether to jump based on the jump bits and ALU flags.
+    // JUMP = (instruction[0] & ALU output negative) OR
+    //        (instruction[1] & ALU output zero) OR
+    //        (instruction[2] & ALU output positive)
+    Not(in=aluNg, out=notNg);
+    Or(a=aluZr, b=notNg, out=aluPos);
+    And(a=instruction[2], b=aluPos, out=jmpPos);
+    And(a=instruction[1], b=aluZr, out=jmpZero);
+    And(a=instruction[0], b=aluNg, out=jmpNeg);
+    Or(a=jmpPos, b=jmpZero, out=jmpNonNeg);
+    Or(a=jmpNonNeg, b=jmpNeg, out=pcJump);
+
+    // Update PC
+    // If reset == 1, PC is set to 0.
+    // Else, if pcJump == 1, PC loads A register's value.
+    // Otherwise, PC increments normally.
+    PC(in=aOut, load=pcJump, inc=true, reset=reset, out=pc);
+
+    // Load Controls
+    // aLoad: A-register load.
+    // dLoad: D-register load.
+    Or(a=instruction[5], b=instruction[4], out=aLoad);
+    Or(a=instruction[4], b=instruction[3], out=dLoad);
 }

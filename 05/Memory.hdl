@@ -22,10 +22,44 @@
  * Screen and Keyboard chip specifications given in the book.
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP Memory {
     IN in[16], load, address[15];
     OUT out[16];
 
     PARTS:
     // Put your code here:
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+    // RAM: Address space for general-purpose memory (0x0000 - 0x3FFF).
+    RAM16K(in=in, load=ramLoad, address=address[0..13], out=ramOut);
+
+    // Screen: Address space for memory-mapped screen (0x4000 - 0x5FFF).
+    Screen(in=in, load=screenLoad, address=address[0..12], out=screenOut);
+
+    // Keyboard: Address space for memory-mapped keyboard (0x6000).
+    Keyboard(out=keyboardOut);
+
+    // Determine the appropriate memory range:
+    // If address < 0x4000, use RAM.
+    // If 0x4000 <= address < 0x6000, use Screen.
+    // If address == 0x6000, use Keyboard.
+    Or(a=address[14], b=address[13], out=screenOrKeyboard);
+    Not(in=screenOrKeyboard, out=ramEnable);
+
+    // Screen load control: address in the range 0x4000 - 0x5FFF.
+    And(a=address[14], b=notAddress13, out=screenEnable);
+
+    // Keyboard output control: address == 0x6000.
+    And(a=address[14], b=address[13], out=keyboardEnable);
+
+    // Load signals for RAM, Screen, and Keyboard.
+    And(a=ramEnable, b=load, out=ramLoad);
+    And(a=screenEnable, b=load, out=screenLoad);
+
+    // Output Mux: Selects the correct output based on the address.
+    Mux16(a=ramOut, b=screenOut, sel=screenEnable, out=ramOrScreenOut);
+    Mux16(a=ramOrScreenOut, b=keyboardOut, sel=keyboardEnable, out=out);
 }

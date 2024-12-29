@@ -7,6 +7,7 @@
  * Computes the sum of three bits.
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP FullAdder {
     IN a, b, c;  // 1-bit inputs
     OUT sum,     // Right bit of a + b + c
@@ -14,4 +15,9 @@ CHIP FullAdder {
 
     PARTS:
     // Put you code here:
+    Xor(a=a, b=b, out=d);
+    Xor(a=d, b=c, out=sum);
+    And(a=a, b=b, out=e);
+    And(a=d, b=c, out=f);
+    Or(a=f, b=e, out=carry);
 }

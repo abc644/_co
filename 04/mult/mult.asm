@@ -7,3 +7,24 @@
 // (R0, R1, R2 refer to RAM[0], RAM[1], and RAM[2], respectively.)
 
 // Put your code here.
+
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
+@2
+M=0
+@1
+D=M
+@17
+D;JLE
+@2
+D=M
+@0
+D=D+M
+@2
+M=D
+@1
+D=M
+M=D-1
+@2
+0;JMP
+@17
+0;JMP

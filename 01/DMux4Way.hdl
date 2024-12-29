@@ -11,10 +11,14 @@
  *                {0, 0, 0, in} if sel == 11
  */
 
+//到處複製來的，有些交給chatgpt修改，有些是chatgpt生成的
 CHIP DMux4Way {
     IN in, sel[2];
     OUT a, b, c, d;
 
     PARTS:
     // Put your code here:
+    DMux(in=in, sel=sel[1], a=ao, b=bo);
+    DMux(in=ao, sel=sel[0], a=a, b=b);
+    DMux(in=bo, sel=sel[0], a=c, b=d);
 }
